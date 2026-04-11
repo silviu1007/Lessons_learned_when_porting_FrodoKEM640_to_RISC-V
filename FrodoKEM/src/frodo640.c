@@ -38,10 +38,27 @@ uint16_t CDF_TABLE_LEN = 13;
 #define crypto_kem_enc                crypto_kem_enc_Frodo640
 #define crypto_kem_dec                crypto_kem_dec_Frodo640
 
+//original working block 
+// #include "kem.c"
+// #include "noise.c"
+// #if defined (USE_TESTING)
+// #include "frodo_macrify_testing.c"
+// #elif defined(USE_REFERENCE)
+// #include "frodo_macrify_reference.c"
+// #else
+// #include "frodo_macrify.c"
+// #endif
+
+#if defined(USE_TESTING)
+#include "kem_testing.c"
+#include "noise.c"
+#include "frodo_macrify_testing.c"
+#elif defined(USE_REFERENCE)
 #include "kem.c"
 #include "noise.c"
-#if defined(USE_REFERENCE)
 #include "frodo_macrify_reference.c"
 #else
+#include "kem.c"
+#include "noise.c"
 #include "frodo_macrify.c"
 #endif

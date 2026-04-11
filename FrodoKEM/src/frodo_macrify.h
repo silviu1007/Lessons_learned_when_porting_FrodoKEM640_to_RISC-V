@@ -22,6 +22,11 @@ void clear_bytes(uint8_t *mem, size_t n);
 int frodo_mul_add_as_plus_e(uint16_t *b, const uint16_t *s, const uint16_t *e, const uint8_t *seed_A);
 int frodo_mul_add_sa_plus_e(uint16_t *b, const uint16_t *s, uint16_t *e, const uint8_t *seed_A);
 void frodo_mul_add_sb_plus_e(uint16_t *out, const uint16_t *b, const uint16_t *s, const uint16_t *e);
+// #if defined(USE_TESTING)
+// void frodo_mul_add_sb_plus_e(uint16_t *out, const uint8_t *pk_b, const uint16_t *s, const uint16_t *e);
+// #else
+// void frodo_mul_add_sb_plus_e(uint16_t *out, const uint16_t *b, const uint16_t *s, const uint16_t *e);
+// #endif
 void frodo_mul_bs(uint16_t *out, const uint16_t *b, const uint16_t *s);
 
 void frodo_add(uint16_t *out, const uint16_t *a, const uint16_t *b);
