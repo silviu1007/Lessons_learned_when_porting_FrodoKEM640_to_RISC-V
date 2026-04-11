@@ -7,17 +7,15 @@
 #if defined (USE_SHAKE128_FOR_A)
     #include "../../common/sha3/fips202.h"
 #endif    
-extern void inner_mul_row(uint16_t *out_row, const uint16_t *s, const uint16_t *A_row);
-
 
 
 int frodo_mul_add_as_plus_e(uint16_t *out, const uint16_t *s, const uint16_t *e, const uint8_t *seed_A) 
 { // Generate-and-multiply: generate matrix A (N x N) row-wise, multiply by s on the right.
   // Inputs: s, e (N x N_BAR)
   // Output: out = A*s + e (N x N_BAR)
-    int i,  j;//, k;
+    int i, j, k;
     uint16_t A_row[PARAMS_N] = {0};
-   // uint16_t s_col[PARAMS_NBAR];
+    uint16_t s_col[PARAMS_NBAR];
     uint8_t seed_A_separated[2 + BYTES_SEED_A];
     uint16_t* seed_A_origin = (uint16_t*)&seed_A_separated;
     memcpy(&seed_A_separated[2], seed_A, BYTES_SEED_A);
@@ -28,13 +26,12 @@ int frodo_mul_add_as_plus_e(uint16_t *out, const uint16_t *s, const uint16_t *e,
         for (j = 0; j < PARAMS_N; j++) {
             A_row[j] = LE_TO_UINT16(A_row[j]);
         }
-        // for (j = 0; j < PARAMS_N; j++) {
-        //     for (k = 0; k < PARAMS_NBAR; k++)
-        //         s_col[k] = s[k*PARAMS_N + j];
-        //     for (k = 0; k < PARAMS_NBAR; k++)
-        //         out[i*PARAMS_NBAR + k] += A_row[j] * s_col[k];
-        // }
-        inner_mul_row(out + i*PARAMS_NBAR, s, A_row);
+        for (j = 0; j < PARAMS_N; j++) {
+            for (k = 0; k < PARAMS_NBAR; k++)
+                s_col[k] = s[k*PARAMS_N + j];
+            for (k = 0; k < PARAMS_NBAR; k++)
+                out[i*PARAMS_NBAR + k] += A_row[j] * s_col[k];
+        }
     }
     return 1;
 }
