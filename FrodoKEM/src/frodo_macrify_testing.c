@@ -9,7 +9,7 @@
 #endif    
 extern void inner_mul_row(uint16_t *out_row, const uint16_t *s, const uint16_t *A_row);
 extern void inner_mul_row_v2(uint16_t *out_row, const uint16_t *s, const uint16_t *A_row);
-
+extern void sa_mul_row(uint16_t *out_row, const uint16_t *A_row, uint16_t s_prime);
 
 
 int frodo_mul_add_as_plus_e(uint16_t *out, const uint16_t *s, const uint16_t *e, const uint8_t *seed_A) 
@@ -60,12 +60,14 @@ int frodo_mul_add_sa_plus_e(uint16_t *out, const uint16_t *s, uint16_t *e, const
             A_row[j] = LE_TO_UINT16(A_row[j]);
         }
         for (k = 0; k < PARAMS_NBAR; k++) {
+            // uint16_t s_prime = s[k*PARAMS_N + i];
+            // for (j = 0; j < PARAMS_N; j++) {
+            //     out[k*PARAMS_N + j] += s_prime * A_row[j];
             uint16_t s_prime = s[k*PARAMS_N + i];
-            for (j = 0; j < PARAMS_N; j++) {
-                out[k*PARAMS_N + j] += s_prime * A_row[j];
+            sa_mul_row(out + k*PARAMS_N, A_row, (uint16_t)s_prime);
             }
         }
-    }
+    
     return 1;
 }
 

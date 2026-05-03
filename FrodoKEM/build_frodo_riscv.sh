@@ -10,7 +10,7 @@ DEFINES="-DNIX -D_PPC_ -D_REFERENCE_ -D_SHAKE128_FOR_A_ -DNO_OPENSSL -DUSE_TESTI
 INCLUDES="-I./src -I../common -I../common/aes -I../common/sha3 -I../common/random"
 COMMON_FLAGS="-std=gnu11 -static $MARCH $DEFINES $INCLUDES"
 
-SRCS_LIB="src/frodo640.c src/util.c src/inner_mul.S src/inner_mul_v2.S \
+SRCS_LIB="src/frodo640.c src/util.c src/inner_mul.S src/inner_mul_v2.S src/sa_mul_row.S \
           ../common/random/random.c \
           ../common/aes/aes_c.c \
           ../common/sha3/fips202.c"
