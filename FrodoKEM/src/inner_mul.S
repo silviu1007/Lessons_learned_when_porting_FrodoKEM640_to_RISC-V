@@ -1,48 +1,11 @@
 .section .text
 .globl inner_mul_row
 
-# void inner_mul_row(uint16_t *out_row,     <- a0  (points to out + i*NBAR)
-#                    const uint16_t *s,     <- a1  (points to s base)
-#                    const uint16_t *A_row) <- a2  (points to A_row base)
-#
-# Computes for one row i of A:
-#   for j in 0..PARAMS_N-1:
-#     for k in 0..PARAMS_NBAR-1:
-#       out_row[k] += A_row[j] * s[k*PARAMS_N + j]
-#
-# Equivalent C (with out_row = out + i*PARAMS_NBAR):
-#   for (j = 0; j < PARAMS_N; j++) {
-#       for (k = 0; k < PARAMS_NBAR; k++)
-#           s_col[k] = s[k*PARAMS_N + j];
-#       for (k = 0; k < PARAMS_NBAR; k++)
-#           out_row[k] += A_row[j] * s_col[k];
-#   }
-#
-# Key optimisation: out_row[0..7] held in s0..s7 across all 640 j iterations.
-# This eliminates 640*8 = 5120 load-store pairs vs the compiler output
-# which loads and stores out[k] on every single j iteration.
-#
-# Register allocation:
-#   s0..s7   : out_row[0..7] loaded once before loop, stored once after
-#   s8..s11  : row pointers for s rows 2..5 (offset > 2047 byte limit)
-#   t0..t5   : s_col[0..5] for current j
-#   a3, a4   : s_col[6], s_col[7] for current j
-#   a5       : A_row[j]
-#   a6       : scratch for mul result
-#   t6       : loop counter (640 iterations)
-#
-# Row pointers for s rows 6 and 7 saved on stack at sp+104 and sp+112.
-# All 12 s registers are used (s0-s7 for out, s8-s11 for row pointers).
-#
-# RISC-V load immediate offsets: 12-bit signed, max 2047 bytes.
-# S row stride = 640*2 = 1280 bytes.
-# Row 0: a1+0    (fits)
-# Row 1: a1+1280 (fits, 1280 < 2047)
-# Rows 2-5: pre-computed pointers in s8-s11
-# Rows 6-7: pre-computed pointers saved on stack
 
 inner_mul_row:
-    # --- prologue ---
+    # putting stack pointer 128 bytes below the caller's stack frame, to save s0..s11 and ra
+    #and also to have space for two row pointers for s rows 6 and 7
+
     addi    sp, sp, -128
     sd      s0,   0(sp)
     sd      s1,   8(sp)
@@ -60,7 +23,7 @@ inner_mul_row:
     # sp+104: row 6 pointer
     # sp+112: row 7 pointer
 
-    # --- load out_row[0..7] into s0..s7 once ---
+    # load the e values for this out_row into s0..s7
     lhu     s0,  0(a0)
     lhu     s1,  2(a0)
     lhu     s2,  4(a0)
@@ -70,7 +33,7 @@ inner_mul_row:
     lhu     s6, 12(a0)
     lhu     s7, 14(a0)
 
-    # --- pre-compute row pointers for s rows 2..7 ---
+    #  pre-compute row pointers for s rows 2..7 and save on stack  (offsets can be up to 2048)
     li      t0, 2560
     add     s8,  a1, t0
     li      t0, 3840
@@ -86,7 +49,7 @@ inner_mul_row:
     add     t1,  a1, t0
     sd      t1, 112(sp)
 
-    # --- loop: 640 iterations, one j per iteration ---
+    # number of iterations
     li      t6, 640
 
 .Lj_loop:
@@ -108,6 +71,7 @@ inner_mul_row:
     lhu     a5, 0(a2)
 
     # multiply A_row[j] against all 8 s_col values, accumulate into s0..s7
+    # builds each element of the current row of B
     mulw    a6, a5, t0  ;  addw    s0, s0, a6
     mulw    a6, a5, t1  ;  addw    s1, s1, a6
     mulw    a6, a5, t2  ;  addw    s2, s2, a6
@@ -132,12 +96,13 @@ inner_mul_row:
     addi    a4, a4, 2
     sd      a4, 112(sp)
 
-    addi    a2, a2, 2         # A_row: one element consumed
+    addi    a2, a2, 2         # A_row pointer advance (e.g from a0 to a1)x
 
+    # loop counter update and loop condition check
     addi    t6, t6, -1
     bnez    t6, .Lj_loop
 
-    # --- store s0..s7 back to out_row ---
+    # write the 8 final accumulated values back to memory (the output row of B + e)
     sh      s0,  0(a0)
     sh      s1,  2(a0)
     sh      s2,  4(a0)
@@ -147,7 +112,7 @@ inner_mul_row:
     sh      s6, 12(a0)
     sh      s7, 14(a0)
 
-    # --- epilogue ---
+    # restore all borrowed registers to their original values
     ld      s0,   0(sp)
     ld      s1,   8(sp)
     ld      s2,  16(sp)
