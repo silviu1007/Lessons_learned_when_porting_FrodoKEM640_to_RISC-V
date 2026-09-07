@@ -1,89 +1,200 @@
 import subprocess
-import time
-import os
 import re
+import os
+import statistics
 
 BENCHMARKS_DIR = "./benchmarks"
-OPT_LEVELS = ["O0", "O1", "O2", "O3", "Os"]
+OPT_LEVELS     = ["O0", "O1", "O2", "O3", "Os"]
+N_RUNS         = 100
 
-def run_binary(binary):
+BINARIES = {
+    "sw":   "frodo640_sw_{opt}",
+    "v1v3": "frodo640_asm13_{opt}",
+    "v2v3": "frodo640_asm23_{opt}",
+}
+
+
+def run_binary_once(binary):
     try:
-        start = time.time()
-        proc = subprocess.run(
+        result = subprocess.run(
             ["/usr/bin/time", "-v", "qemu-riscv64", binary],
-            capture_output=True,
-            text=True,
-            timeout=300
+            capture_output=True, text=True, timeout=300
         )
-        elapsed = time.time() - start
-        output = proc.stdout
-        stderr = proc.stderr
+        stdout = result.stdout
+        stderr = result.stderr
 
-        keygen = re.search(r"Key generation\s+\d+\s+[\d.]+\s+([\d.]+)", output)
-        encaps = re.search(r"KEM encapsulate\s+\d+\s+[\d.]+\s+([\d.]+)", output)
-        decaps = re.search(r"KEM decapsulate\s+\d+\s+[\d.]+\s+([\d.]+)", output)
-        passed = "Tests PASSED" in output
+        keygen = re.search(r"Key generation\s+\d+\s+[\d.]+\s+([\d.]+)", stdout)
+        encaps = re.search(r"KEM encapsulate\s+\d+\s+[\d.]+\s+([\d.]+)", stdout)
+        decaps = re.search(r"KEM decapsulate\s+\d+\s+[\d.]+\s+([\d.]+)", stdout)
         mem    = re.search(r"Maximum resident set size \(kbytes\):\s+(\d+)", stderr)
 
+        if not all([keygen, encaps, decaps, mem]):
+            return None
+
         return {
-            "keygen_us": float(keygen.group(1)) if keygen else None,
-            "encaps_us": float(encaps.group(1)) if encaps else None,
-            "decaps_us": float(decaps.group(1)) if decaps else None,
-            "total_s":   elapsed,
-            "passed":    passed,
-            "peak_kb":   int(mem.group(1)) if mem else None
+            "keygen_us": float(keygen.group(1)),
+            "encaps_us": float(encaps.group(1)),
+            "decaps_us": float(decaps.group(1)),
+            "passed":    "Tests PASSED" in stdout,
+            "peak_kb":   int(mem.group(1)),
         }
+
     except subprocess.TimeoutExpired:
+        print("  timed out")
         return None
     except Exception as e:
-        print(f"    ERROR: {e}")
+        print(f"  error: {e}")
         return None
 
-ref_results     = {}
-testing_results = {}
 
-for opt in OPT_LEVELS:
-    ref_bin     = os.path.abspath(os.path.join(BENCHMARKS_DIR, f"frodo640_{opt}"))
-    testing_bin = os.path.abspath(os.path.join(BENCHMARKS_DIR, f"frodo640_testing_{opt}"))
-
-    print(f"\n=== -{opt} ===")
-    print(f"  [reference] running...")
-    ref_results[opt] = run_binary(ref_bin)
-    print(f"  [testing]   running...")
-    testing_results[opt] = run_binary(testing_bin)
-
-    r = ref_results[opt]
-    t = testing_results[opt]
-    status_r = "PASS" if r and r["passed"] else "FAIL"
-    status_t = "PASS" if t and t["passed"] else "FAIL"
-    print(f"  reference: {status_r}   testing: {status_t}")
-
-print("\n" + "="*100)
-print(f"{'Opt':<6} {'Operation':<12} {'Ref time':>12} {'Test time':>12} {'Time delta':>12} {'Ref RAM (KB)':>14} {'Test RAM (KB)':>14} {'RAM delta':>12}")
-print("-"*100)
-
-for opt in OPT_LEVELS:
-    r = ref_results[opt]
-    t = testing_results[opt]
-
-    for op_name, r_key, t_key in [
-        ("KeyGen",  "keygen_us", "keygen_us"),
-        ("Encaps",  "encaps_us", "encaps_us"),
-        ("Decaps",  "decaps_us", "decaps_us"),
-    ]:
-        r_time   = r[r_key]   if r and r[r_key]   else None
-        t_time   = t[t_key]   if t and t[t_key]   else None
-        r_mem    = r["peak_kb"] if r else None
-        t_mem    = t["peak_kb"] if t else None
-
-        time_delta = f"{((t_time - r_time)/r_time)*100:+.1f}%" if r_time and t_time else "N/A"
-        ram_delta  = f"{t_mem - r_mem:+d} KB"                  if r_mem  and t_mem  else "N/A"
-
-        r_time_str = f"{r_time:.1f} us" if r_time else "FAIL"
-        t_time_str = f"{t_time:.1f} us" if t_time else "FAIL"
-        r_mem_str  = f"{r_mem}"         if r_mem  else "N/A"
-        t_mem_str  = f"{t_mem}"         if t_mem  else "N/A"
-
-        print(f"{'-'+opt:<6} {op_name:<12} {r_time_str:>12} {t_time_str:>12} {time_delta:>12} {r_mem_str:>14} {t_mem_str:>14} {ram_delta:>12}")
-
+def run_binary_n_times(binary, n):
+    results = []
+    for i in range(n):
+        print(f"    run {i+1}/{n}", end="\r", flush=True)
+        r = run_binary_once(binary)
+        if r is not None:
+            results.append(r)
     print()
+    return results
+
+
+def summarise(results):
+    if not results:
+        return None
+
+    def stats(key):
+        vals = [r[key] for r in results]
+        return statistics.mean(vals), statistics.stdev(vals) if len(vals) > 1 else 0.0
+
+    km, ks = stats("keygen_us")
+    em, es = stats("encaps_us")
+    dm, ds = stats("decaps_us")
+    mm, _  = stats("peak_kb")
+
+    return {
+        "keygen_mean": km, "keygen_sd": ks,
+        "encaps_mean": em, "encaps_sd": es,
+        "decaps_mean": dm, "decaps_sd": ds,
+        "mem_mean":    mm,
+        "passed":      all(r["passed"] for r in results),
+        "n":           len(results),
+    }
+
+
+def delta_str(base, test):
+    if base and test:
+        return f"{(test - base) / base * 100:+.1f}%"
+    return "N/A"
+
+
+def mem_str(val):
+    return f"{val:.0f}" if val is not None else "N/A"
+
+
+# ── Run all three binaries per optimisation level ──────────────────────────────
+
+all_results = {opt: {} for opt in OPT_LEVELS}
+
+for opt in OPT_LEVELS:
+    print(f"\n=== -{opt} ===")
+    for label, pattern in BINARIES.items():
+        binary = os.path.join(BENCHMARKS_DIR, pattern.format(opt=opt))
+        print(f"  [{label}] running {N_RUNS} times...")
+        summary = summarise(run_binary_n_times(binary, N_RUNS))
+        all_results[opt][label] = summary
+        if summary:
+            status = "PASS" if summary["passed"] else "FAIL"
+            print(f"  -> {status} ({summary['n']} runs)")
+
+
+# ── Table 1: SW-only vs v1+v3 and v2+v3 ──────────────────────────────────────
+
+SEP = "=" * 130
+
+print(f"\n{SEP}")
+print("  SW-ONLY BASELINE vs v1+v3 and v2+v3")
+print(SEP)
+print(f"{'Opt':<6} {'Op':<10}"
+      f" {'SW mean':>12} {'SW sd':>10}"
+      f" {'v1+v3 mean':>12} {'v1+v3 sd':>10} {'Δ vs SW':>10}"
+      f" {'v2+v3 mean':>12} {'v2+v3 sd':>10} {'Δ vs SW':>10}"
+      f" {'SW RSS':>8} {'v1+v3 RSS':>10} {'v2+v3 RSS':>10}")
+print(SEP)
+
+for opt in OPT_LEVELS:
+    sw   = all_results[opt].get("sw")
+    v1v3 = all_results[opt].get("v1v3")
+    v2v3 = all_results[opt].get("v2v3")
+
+    for op_name, mk, sk in [
+        ("KeyGen", "keygen_mean", "keygen_sd"),
+        ("Encaps", "encaps_mean", "encaps_sd"),
+        ("Decaps", "decaps_mean", "decaps_sd"),
+    ]:
+        sw_m   = sw[mk]   if sw   else None
+        v1_m   = v1v3[mk] if v1v3 else None
+        v2_m   = v2v3[mk] if v2v3 else None
+        sw_s   = sw[sk]   if sw   else None
+        v1_s   = v1v3[sk] if v1v3 else None
+        v2_s   = v2v3[sk] if v2v3 else None
+
+        print(
+            f"{'-'+opt:<6} {op_name:<10}"
+            f" {f'{sw_m:.1f}' if sw_m else 'N/A':>12}"
+            f" {f'±{sw_s:.1f}' if sw_s else 'N/A':>10}"
+            f" {f'{v1_m:.1f}' if v1_m else 'N/A':>12}"
+            f" {f'±{v1_s:.1f}' if v1_s else 'N/A':>10}"
+            f" {delta_str(sw_m, v1_m):>10}"
+            f" {f'{v2_m:.1f}' if v2_m else 'N/A':>12}"
+            f" {f'±{v2_s:.1f}' if v2_s else 'N/A':>10}"
+            f" {delta_str(sw_m, v2_m):>10}"
+            f" {mem_str(sw['mem_mean'] if sw else None):>8}"
+            f" {mem_str(v1v3['mem_mean'] if v1v3 else None):>10}"
+            f" {mem_str(v2v3['mem_mean'] if v2v3 else None):>10}"
+        )
+    print()
+
+
+# ── Table 2: v1+v3 vs v2+v3 head-to-head ─────────────────────────────────────
+
+print(f"\n{SEP}")
+print("  HEAD-TO-HEAD: v1+v3 vs v2+v3  (positive Δ = v2+v3 is slower)")
+print(SEP)
+print(f"{'Opt':<6} {'Op':<10}"
+      f" {'v1+v3 mean':>12} {'v1+v3 sd':>10}"
+      f" {'v2+v3 mean':>12} {'v2+v3 sd':>10}"
+      f" {'Δ (v2 vs v1)':>14}"
+      f" {'RSS delta':>10}")
+print(SEP)
+
+for opt in OPT_LEVELS:
+    v1v3 = all_results[opt].get("v1v3")
+    v2v3 = all_results[opt].get("v2v3")
+
+    for op_name, mk, sk in [
+        ("KeyGen", "keygen_mean", "keygen_sd"),
+        ("Encaps", "encaps_mean", "encaps_sd"),
+        ("Decaps", "decaps_mean", "decaps_sd"),
+    ]:
+        v1_m = v1v3[mk] if v1v3 else None
+        v2_m = v2v3[mk] if v2v3 else None
+        v1_s = v1v3[sk] if v1v3 else None
+        v2_s = v2v3[sk] if v2v3 else None
+
+        rss_v1 = v1v3["mem_mean"] if v1v3 else None
+        rss_v2 = v2v3["mem_mean"] if v2v3 else None
+        rss_d  = f"{rss_v2 - rss_v1:+.0f}" if rss_v1 and rss_v2 else "N/A"
+
+        print(
+            f"{'-'+opt:<6} {op_name:<10}"
+            f" {f'{v1_m:.1f}' if v1_m else 'N/A':>12}"
+            f" {f'±{v1_s:.1f}' if v1_s else 'N/A':>10}"
+            f" {f'{v2_m:.1f}' if v2_m else 'N/A':>12}"
+            f" {f'±{v2_s:.1f}' if v2_s else 'N/A':>10}"
+            f" {delta_str(v1_m, v2_m):>14}"
+            f" {rss_d:>10}"
+        )
+    print()
+
+print(SEP)
+print("Done.")

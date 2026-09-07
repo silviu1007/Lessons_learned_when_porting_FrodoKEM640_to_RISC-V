@@ -16,9 +16,9 @@ int frodo_mul_add_as_plus_e(uint16_t *out, const uint16_t *s, const uint16_t *e,
 { // Generate-and-multiply: generate matrix A (N x N) row-wise, multiply by s on the right.
   // Inputs: s, e (N x N_BAR)
   // Output: out = A*s + e (N x N_BAR)
-    int i,  j;//, k;
+    int i,  j , k;
     uint16_t A_row[PARAMS_N] = {0};
-   // uint16_t s_col[PARAMS_NBAR];
+    uint16_t s_col[PARAMS_NBAR];
     uint8_t seed_A_separated[2 + BYTES_SEED_A];
     uint16_t* seed_A_origin = (uint16_t*)&seed_A_separated;
     memcpy(&seed_A_separated[2], seed_A, BYTES_SEED_A);

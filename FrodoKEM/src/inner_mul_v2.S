@@ -1,39 +1,7 @@
 .section .text
 .globl inner_mul_row_v2
 
-# void inner_mul_row_v2(uint16_t *out_row,     <- a0
-#                       const uint16_t *s,     <- a1  (S^T base)
-#                       const uint16_t *A_row) <- a2
-#
-# Computes for one row i of A:
-#   for k in 0..PARAMS_NBAR-1:
-#     for j in 0..PARAMS_N-1:
-#       out_row[k] += A_row[j] * s[k*PARAMS_N + j]
-#
-# Equivalent C (with out_row = out + i*PARAMS_NBAR):
-#   for (k = 0; k < PARAMS_NBAR; k++) {
-#       for (j = 0; j < PARAMS_N; j++)
-#           out_row[k] += A_row[j] * s[k*PARAMS_N + j];
-#   }
-#
 
-# Register allocation:
-#   a0      : out_row base pointer (preserved throughout)
-#   a1      : S^T base pointer (preserved throughout)
-#   a2      : A_row base pointer (preserved throughout)
-#   a3      : s_ptr — pointer into row k of S^T (set each outer iter)
-#   a4      : a_ptr — pointer into A_row (reset each outer iter)
-#   a5      : acc — accumulator for out_row[k]
-#   a6      : packed A pair from lw (A[j] in bits 15:0, A[j+1] in bits 31:16)
-#   a7      : packed S pair from lw (S^T[k][j] in bits 15:0, S^T[k][j+1] in 31:16)
-#   t0      : A[j]   — lower halfword extracted from a6
-#   t1      : A[j+1] — upper halfword extracted from a6
-#   t2      : S^T[k][j]   — lower halfword extracted from a7
-#   t3      : S^T[k][j+1] — upper halfword extracted from a7
-#   t4      : scratch for mulw result
-#   t5      : inner loop counter (320)
-#   t6      : outer loop counter (8)
-#   s0      : row byte offset into S^T (k * 1
 inner_mul_row_v2:
 
     addi   sp, sp, -16
