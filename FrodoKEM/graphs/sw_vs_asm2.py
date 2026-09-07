@@ -4,13 +4,13 @@ import numpy as np
 OPT_LEVELS = ["O0", "O1", "O2", "O3", "Os"]
 labels = [f"-{o}" for o in OPT_LEVELS]
 
-# ── Version 1 data (inner_mul_row) ─────────────────────────────────────────────
+# Version 1 data (inner_mul_row)
 v1_sw_mean  = [46702.5, 13489.6, 21122.6, 14393.4, 14194.7]
 v1_sw_sd    = [10183.0,  2440.6,  2878.3,   164.3,  2338.0]
 v1_asm_mean = [23208.4,  9061.3, 17032.7, 13424.7,  9260.9]
 v1_asm_sd   = [ 5395.4,  1486.2,  4287.0,   213.0,   159.9]
 
-# ── Version 2 data (inner_mul_row_v2) ──────────────────────────────────────────
+#  Version 2 data (inner_mul_row_v2) 
 v2_sw_mean  = [42563.2, 10785.0, 17338.5, 14371.8, 13100.2]
 v2_sw_sd    = [ 6489.4,  1046.7,   212.5,   857.5,   195.4]
 v2_asm_mean = [16488.6,  7799.6, 14293.8, 13936.7,  8873.5]
@@ -37,9 +37,8 @@ plt.rcParams.update({
 x = np.arange(len(OPT_LEVELS))
 width = 0.25
 
-# ── Plot 1: Absolute times, three bars ────────────────────────────────────────
-# Use v2 sw as the baseline (they differ slightly due to different runs,
-# so show all three: sw_v1, asm_v1, asm_v2)
+
+# Use v2 sw as the baseline (they differ slightly due to different runs, so show all three: sw_v1, asm_v1, asm_v2)
 fig, ax = plt.subplots(figsize=(9, 5))
 
 ax.bar(x - width,     v1_sw_mean,  width, yerr=v1_sw_sd,
@@ -68,7 +67,7 @@ plt.savefig("keygen_absolute_v1v2.png", dpi=150, bbox_inches="tight")
 print("Saved keygen_absolute_v1v2")
 plt.close()
 
-# ── Plot 2: Delta % both versions side by side ────────────────────────────────
+# Delta % both versions side by side
 fig, ax = plt.subplots(figsize=(9, 5))
 
 ax.bar(x - width/2, v1_delta, width, label="Assembly v1",

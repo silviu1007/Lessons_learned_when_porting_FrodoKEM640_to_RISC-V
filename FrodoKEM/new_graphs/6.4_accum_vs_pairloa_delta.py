@@ -18,13 +18,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ── Data (computed from sw_vs_asm1.txt and sw_vs_asm2.txt) ───────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 v1_delta = [-50.3, -32.8, -19.4, -6.7, -34.8]   # accumulator vs its SW
 v2_delta = [-61.3, -27.7, -17.6, -3.0, -32.3]   # paired-load vs its SW
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

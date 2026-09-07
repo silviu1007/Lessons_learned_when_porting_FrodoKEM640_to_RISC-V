@@ -22,7 +22,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-# ── Data (from tot_fara_noise.txt) ────────────────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 sw_kg_mean = [43131.2, 11317.8, 17808.6, 14657.6, 13486.2]
@@ -46,7 +45,6 @@ v2v3_en_sd   = [ 3210.9,  1109.5,  1096.7,  2224.1,  1144.7]
 v2v3_de_mean = [19831.6,  7894.1, 13795.0, 14647.7,  9332.2]
 v2v3_de_sd   = [ 2435.2,   935.0,  1782.1,  2483.3,   206.4]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

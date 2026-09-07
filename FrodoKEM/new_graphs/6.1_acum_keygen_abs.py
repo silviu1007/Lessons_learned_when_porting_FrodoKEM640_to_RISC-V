@@ -17,7 +17,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-# ── Data (from sw_vs_asm1.txt) ───────────────────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 sw_mean = [46702.5, 13489.6, 21122.6, 14393.4, 14194.7]
@@ -26,7 +25,6 @@ sw_sd   = [10183.0,  2440.6,  2878.3,   164.3,  2338.0]
 asm_mean = [23208.4,  9061.3, 17032.7, 13424.7,  9260.9]
 asm_sd   = [ 5395.4,  1486.2,  4287.0,   213.0,   159.9]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

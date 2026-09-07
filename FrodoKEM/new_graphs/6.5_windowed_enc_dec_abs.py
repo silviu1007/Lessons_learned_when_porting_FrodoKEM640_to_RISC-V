@@ -21,7 +21,6 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
 import numpy as np
 
-# ── Data (from sw_vs_asm3.txt) ───────────────────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 enc_sw_mean  = [27518.9,  8117.4, 14689.8, 14453.2,  9838.5]
@@ -34,7 +33,6 @@ dec_sw_sd    = [  701.5,   105.6,   170.3,   282.2,   133.5]
 dec_asm_mean = [16864.8,  7502.5, 13916.7, 13640.2,  8544.3]
 dec_asm_sd   = [  238.2,    94.1,   208.0,   243.8,   715.6]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

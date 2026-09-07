@@ -4,7 +4,7 @@ import numpy as np
 OPT_LEVELS = ["O0", "O1", "O2", "O3", "Os"]
 labels = [f"-{o}" for o in OPT_LEVELS]
 
-# ── Data from 100-run benchmark ────────────────────────────────────────────────
+# Data from 100-run benchmark 
 sw_keygen_mean  = [46702.5, 13489.6, 21122.6, 14393.4, 14194.7]
 sw_keygen_sd    = [10183.0,  2440.6,  2878.3,   164.3,  2338.0]
 asm_keygen_mean = [23208.4,  9061.3, 17032.7, 13424.7,  9260.9]
@@ -26,7 +26,7 @@ plt.rcParams.update({
 x = np.arange(len(OPT_LEVELS))
 width = 0.35
 
-# ── Plot 1: Absolute times ─────────────────────────────────────────────────────
+# Plot 1: Absolute times
 fig, ax = plt.subplots(figsize=(8, 5))
 
 ax.bar(x - width/2, sw_keygen_mean,  width, yerr=sw_keygen_sd,
@@ -52,7 +52,7 @@ plt.savefig("keygen_absolute.png", dpi=150, bbox_inches="tight")
 print("Saved keygen_absolute")
 plt.close()
 
-# ── Plot 2: Delta % bar chart ──────────────────────────────────────────────────
+# Plot 2: Delta % bar chart
 fig, ax = plt.subplots(figsize=(8, 5))
 
 bars = ax.bar(labels, keygen_delta, color=ASM_COLOR, alpha=0.85, width=0.5)

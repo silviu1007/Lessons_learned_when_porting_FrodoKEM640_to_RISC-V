@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import matplotlib.ticker as mticker
 import numpy as np
 
-# ── Data from benchmark output ────────────────────────────────────
+# Data from benchmark output 
 OPT = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 data = {
@@ -36,7 +36,7 @@ COLORS = {'SW-only': '#5B8DB8', 'Assembly v2+v3': '#E07B39'}
 x = np.arange(len(OPT))
 w = 0.35
 
-# ── Figure 1: Absolute times ──────────────────────────────────────
+# Figure 1: Absolute times 
 fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=False)
 fig.suptitle('Wall-clock time: SW-only vs Assembly v2+v3 under QEMU\n'
              '(100 runs, error bars = 1 std dev)', fontsize=12)
@@ -65,7 +65,7 @@ plt.savefig('v2v3_absolute.png', dpi=150, bbox_inches='tight')
 print("Saved v2v3_absolute.pdf")
 plt.close()
 
-# ── Figure 2: Delta bars ──────────────────────────────────────────
+# Figure 2: Delta bars 
 fig, ax = plt.subplots(figsize=(10, 5))
 bw = 0.22
 offsets = {'KeyGen': -bw, 'Encaps': 0, 'Decaps': bw}

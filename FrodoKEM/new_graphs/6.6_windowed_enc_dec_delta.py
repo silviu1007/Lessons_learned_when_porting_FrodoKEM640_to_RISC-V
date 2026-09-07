@@ -16,13 +16,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ── Data (computed from sw_vs_asm3.txt) ──────────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 enc_delta = [-39.1, -8.3, -4.8, -5.2, -14.3]
 dec_delta = [-38.8, -8.2, -4.8, -5.2, -13.0]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

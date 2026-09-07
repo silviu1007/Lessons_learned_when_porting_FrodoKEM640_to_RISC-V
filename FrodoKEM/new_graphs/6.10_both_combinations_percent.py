@@ -17,7 +17,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ── Data (computed from tot_fara_noise.txt) ───────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 # v1+v3 vs SW
@@ -30,7 +29,6 @@ v2v3_kg = [-55.5, -28.7, -20.9,  +1.0, -32.2]
 v2v3_en = [-42.1, -10.5,  -5.3,  -0.2,  -7.6]
 v2v3_de = [-41.1,  -8.3,  -7.5,  +0.3,  -6.7]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

@@ -17,7 +17,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ── Data (computed from tot_fara_noise.txt) ───────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 # (v1v3_mean - sw_mean) / sw_mean * 100
@@ -25,7 +24,7 @@ kg_delta = [-52.8, -35.1, -22.9, -6.7, -35.5]
 en_delta = [-35.8, -12.1,  -3.8, -4.4,  -9.1]
 de_delta = [-33.9,  -9.3,  -3.9, -5.0,  -9.5]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
+
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

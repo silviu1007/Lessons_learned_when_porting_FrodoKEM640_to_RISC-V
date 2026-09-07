@@ -31,7 +31,6 @@ data = {
 
 COLORS = {'SW-only': '#5B8DB8', 'Accumulator+Windowed': '#4C72B0'}
 
-# ── Absolute ──────────────────────────────────────────────────────────────────
 fig, axes = plt.subplots(1, 3, figsize=(15, 5), sharey=False)
 fig.suptitle('Wall-clock time: SW-only vs accumulator and windowed assembly\n'
              '(100 runs, error bars = 1 std dev)', fontsize=11)
@@ -58,7 +57,6 @@ plt.savefig('combined_absolute_v1v3.png', dpi=150, bbox_inches='tight')
 print("Saved combined_absolute_v1v3")
 plt.close()
 
-# ── Delta ─────────────────────────────────────────────────────────────────────
 deltas = {
     'KeyGen': [-52.8, -35.1, -22.9, -6.7, -35.5],
     'Encaps': [-35.8, -12.1,  -3.8, -4.4,  -9.1],

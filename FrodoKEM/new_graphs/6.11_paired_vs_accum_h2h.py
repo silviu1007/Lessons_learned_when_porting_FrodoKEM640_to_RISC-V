@@ -24,7 +24,6 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ── Data (computed from tot_fara_noise.txt) ───────────────────────────────────
 # rel = (v2v3_mean - v1v3_mean) / v1v3_mean * 100
 # positive = v2+v3 is slower, negative = v2+v3 is faster
 
@@ -34,7 +33,6 @@ rel_kg = [-5.6, +9.8, +2.5, +8.3, +5.2]
 rel_en = [-9.7, +1.8, -1.5, +4.4, +1.6]
 rel_de = [-11.0, +1.2, -3.7, +5.5, +3.1]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

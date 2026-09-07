@@ -20,13 +20,11 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import numpy as np
 
-# ── Data (computed from sw_vs_asm1.txt) ──────────────────────────────────────
 LEVELS = ['-O0', '-O1', '-O2', '-O3', '-Os']
 
 # (asm_mean - sw_mean) / sw_mean * 100, all negative = assembly is faster
 delta_pct = [-50.3, -32.8, -19.4, -6.7, -34.8]
 
-# ── Plot ─────────────────────────────────────────────────────────────────────
 plt.rcParams.update({
     'font.family': 'serif', 'font.size': 10,
     'axes.spines.top': False, 'axes.spines.right': False,

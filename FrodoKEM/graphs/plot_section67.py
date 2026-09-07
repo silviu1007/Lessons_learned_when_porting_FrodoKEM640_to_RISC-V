@@ -7,7 +7,6 @@ import numpy as np
 OPT = ['-O0', '-O1', '-O2', '-O3', '-Os']
 x   = np.arange(len(OPT))
 
-# ── Data ──────────────────────────────────────────────────────────────────────
 sw_keygen  = [43131.2, 11317.8, 17808.6, 14657.6, 13486.2]
 sw_enc     = [33858.4,  8625.4, 14874.0, 14736.3,  9807.4]
 sw_dec     = [33682.4,  8604.6, 14907.4, 14611.1, 10001.1]
@@ -29,7 +28,7 @@ v2_keygen_sd = [3138.5,  428.7, 1770.6, 3548.5, 1501.0]
 v2_enc_sd    = [3210.9, 1109.5, 1096.7, 2224.1, 1144.7]
 v2_dec_sd    = [2435.2,  935.0, 1782.1, 2483.3,  206.4]
 
-# ── Plot 1: Three-way absolute ────────────────────────────────────────────────
+#Plot 1: Three-way absolute 
 w = 0.25
 fig, axes = plt.subplots(1, 3, figsize=(16, 5), sharey=False)
 fig.suptitle('Wall-clock time: SW-only vs both combined assembly configurations\n'
@@ -58,7 +57,7 @@ plt.savefig('v2v3_three_way_absolute.png', dpi=150, bbox_inches='tight')
 print("Saved v2v3_three_way_absolute")
 plt.close()
 
-# ── Plot 2: Both deltas vs SW ─────────────────────────────────────────────────
+# Plot 2: Both deltas vs SW 
 deltas_v1 = {'KeyGen': [-52.8,-35.1,-22.9, -6.7,-35.5],
              'Encaps': [-35.8,-12.1, -3.8, -4.4, -9.1],
              'Decaps': [-33.9, -9.3, -3.9, -5.0, -9.5]}

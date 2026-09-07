@@ -4,7 +4,7 @@ import numpy as np
 OPT_LEVELS = ["O0", "O1", "O2", "O3", "Os"]
 labels = [f"-{o}" for o in OPT_LEVELS]
 
-# ── Version 3 data (sa_mul_row) ────────────────────────────────────────────────
+# Version 3 data (sa_mul_row)
 sw_encaps_mean  = [27518.9,  8117.4, 14689.8, 14453.2,  9838.5]
 sw_encaps_sd    = [ 1680.1,   106.6,   175.4,   274.3,   771.3]
 asm_encaps_mean = [16767.7,  7441.9, 13984.0, 13704.7,  8431.2]
@@ -37,7 +37,7 @@ plt.rcParams.update({
 x = np.arange(len(OPT_LEVELS))
 width = 0.25
 
-# ── Plot 1: Absolute times (Encaps + Decaps side by side) ─────────────────────
+# Plot 1: Absolute times (Encaps + Decaps side by side) 
 fig, axes = plt.subplots(1, 2, figsize=(13, 5), sharey=True)
 
 for ax, op, sw_m, sw_s, asm_m, asm_s, color in [
@@ -71,7 +71,7 @@ plt.savefig("encaps_decaps_absolute_v3.png", dpi=150, bbox_inches="tight")
 print("Saved encaps_decaps_absolute_v3")
 plt.close()
 
-# ── Plot 2: Delta % both operations ───────────────────────────────────────────
+# Plot 2: Delta % both operations
 fig, ax = plt.subplots(figsize=(9, 5))
 
 ax.bar(x - width/2, encaps_delta, width, label="Encaps",
