@@ -15,7 +15,7 @@ Bachelor's thesis project (Radboud University) porting **FrodoKEM-640** — a po
 - [3. Results](#3-results)
 - [4. Other Branches](#4-other-branches)
 
----
+
 
 ## 1. Running the Code
 
@@ -141,7 +141,7 @@ KeyGen is where the assembly work pays off most consistently, a double-digit imp
 
 (percentages are how much slower the losing config was, relative to the winner)
 
-There's no single universal winner here, which is worth being precise about rather than rounding it off: at `-O0` (no compiler optimization), paired-load (`asm23`) is faster across all three operations. Once any optimization flag is turned on, accumulator (`asm13`) takes the lead for KeyGen every time, and usually for Encaps/Decaps too — except at `-O2`, where paired-load stays ahead on Encaps and Decaps despite losing KeyGen. If you need a single default to build with going forward, `asm13` is the safer pick for anything compiled with `-O1` or higher, but re-run the benchmarks rather than assuming this holds if you change the kernels.
+There's no single universal winner here, which is worth being precise about rather than rounding it off: at `-O0` (no compiler optimization), paired-load (`asm23`) is faster across all three operations. Once any optimization flag is turned on, accumulator (`asm13`) takes the lead for KeyGen every time, and usually for Encaps/Decaps too, except at `-O2`, where paired-load stays ahead on Encaps and Decaps despite losing KeyGen. If you need a single default to build with going forward, `asm13` is the safer pick for anything compiled with `-O1` or higher, but re-run the benchmarks rather than assuming this holds if you change the kernels.
 
 Also worth knowing before changing the assembly further:
 
